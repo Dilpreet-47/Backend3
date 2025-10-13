@@ -4,11 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Dilpreet-47/Backend3.git"
+    "url": "git+https://github.com/Dilpreet-47/Backend3.git"  
   },
   "keywords": [],
   "author": "",
@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Dilpreet-47/Backend3#readme",
   "dependencies": {
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "mongoose": "^8.19.1"
   },
