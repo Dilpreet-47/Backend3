@@ -4,9 +4,9 @@ import { User } from "../models/user.models.js";
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiRes } from "../utils/ApiRes.js";
 
-const generateAccessAndRefreshTokens = async (userId) => {
+const generateAccessandRefreshTokens = async (userID) => {
   try {
-    const user = await User.findById(userId);
+    const user = await User.findById(userID);
     const accessToken = user.generateAccessToken();
     const refreshToken = user.generateRefreshToken();
 
@@ -15,7 +15,10 @@ const generateAccessAndRefreshTokens = async (userId) => {
 
     return { accessToken, refreshToken };
   } catch (error) {
-    throw new ApiError(500, "Something went wrong");
+    throw new ApiError(
+      500,
+      "Something went wrong while generation of access and refresh tokens"
+    );
   }
 };
 
@@ -75,27 +78,25 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  const { email, username, password } = req.body;
 
-  if (!username || !email) {
-    throw new ApiError(400, "Username and Email is required");
+  if (!username && !email) {
+    throw new ApiError(400, "username or email is required!");
   }
 
-  const user = await User.findOne({
-    $or: [{ username }, { email }],
-  });
+  const user = await User.findOne({ $or: [{ username }, { email }] });
 
   if (!user) {
-    throw new ApiError(400, "User not exists");
+    throw new ApiError(404, "User does not exists");
   }
 
-  const isPasswordValid = await user.isPasswordCorrect(password);
+  const passwordCheck = await user.isPasswordCorrect(password);
 
-  if (!isPasswordValid) {
-    throw new ApiError(401, "password is not valid");
+  if (!passwordCheck) {
+    throw new ApiError(401, "password not matched");
   }
 
-  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+  const { accessToken, refreshToken } = await generateAccessandRefreshTokens(
     user._id
   );
 
@@ -116,7 +117,7 @@ const loginUser = asyncHandler(async (req, res) => {
       new ApiRes(
         200,
         { user: loggedInUser, accessToken, refreshToken },
-        "User logged In Succesfully"
+        "User logged in Successfully"
       )
     );
 });
@@ -145,4 +146,4 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiRes(200, {}, "User Logged Out Succesfully"));
 });
 
-export { registerUser, loginUser };
+export { registerUser, loginUser , logoutUser};
